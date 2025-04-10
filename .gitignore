@@ -1,0 +1,10 @@
+#env files
+#.env
+
+#logs
+
+#server/jobs/cron.log
+
+#other
+server/app/utils/__pycache__
+server/notebooks/docker/token.txt

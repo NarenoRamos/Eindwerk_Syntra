@@ -1,0 +1,7 @@
+wheel
+Flask
+psycopg2-binary
+pandas
+python-dotenv
+flask-cors
+gunicorn

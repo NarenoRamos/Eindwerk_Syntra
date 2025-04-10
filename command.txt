@@ -1,0 +1,2 @@
+#command om react app te generen
+docker run --rm -v ./client:/app node:latest npx create-vite@latest /app --template react

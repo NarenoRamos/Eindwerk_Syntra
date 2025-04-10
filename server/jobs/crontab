@@ -1,0 +1,1 @@
+*/5 * * * * /app/venv/bin/python /app/measure_point_data_etl.py >> /var/log/cron.log 2>&1

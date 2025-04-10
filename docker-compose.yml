@@ -1,0 +1,139 @@
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    container_name: ${DB_HOST}
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:5432"
+    networks:
+      - ${NETWORK}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ${PGAMDIN_HOST}
+    restart: always
+    env_file: .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'True'
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'True'
+    ports:
+      - "${PGADMIN_PORT}:80"
+    depends_on:
+      - db
+    networks:
+      - ${NETWORK}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin  
+
+  backend:
+    build:
+      context: ./server/app
+      dockerfile: Dockerfile #.dev voor development mode 
+    container_name: ${FLASK_HOST}
+    env_file: .env
+    environment:
+      DB_HOST: db
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      FLASK_ENV: ${FLASK_ENV:-development}
+      FLASK_DEBUG: ${FLASK_DEBUG:-0}
+    restart: unless-stopped
+    networks:
+      - ${NETWORK}
+    ports:
+      - "${FLASK_PORT}:5000"
+    depends_on:
+      - db
+    volumes:
+      - ./server/app/app.py:/app/app.py
+      - ./server/app/utils:/app/utils
+
+  cron-c:
+    build:
+      context: ./server/jobs
+    container_name: ${CRON_HOST}
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - ${NETWORK}
+    volumes:
+      - ./server/jobs/cron.log:/var/log/cron.log
+      - ./.env:/app/.env #volume mount .env because of own environment crontab
+      - ./server/jobs/measure_point_data_etl.py:/app/measure_point_data_etl.py
+
+  react-app:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: ${REACT_HOST}
+    env_file: .env
+    ports:
+      - "${REACT_DEV_PORT}:5173"
+    volumes:
+      - ./client:/app
+    environment:
+      VITE_API_URL: http://backend:${FLASK_PORT}/${API_KEY}/
+    networks:
+      - ${NETWORK}
+    depends_on:
+      - db
+      - backend
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: ${REVERSE_PROXY_HOST}
+    env_file: .env
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      SERVER_HOST: backend
+      SERVER_PORT: ${FLASK_PORT}
+      API_KEY: ${API_KEY}
+    volumes:
+      - ./reverse-proxy/default.conf.template:/etc/nginx/templates/default.conf.template
+    ports:
+      - "${REVERSE_PROXY_PORT}:80"
+    networks:
+      - ${NETWORK}
+    depends_on:
+      - db
+      - backend
+    restart: always
+
+  jupyter-server:
+    build:
+      context:
+        ./server/notebooks/docker
+    container_name: ${JUPYTER_HOST}
+    env_file: .env
+    networks:
+      - ${NETWORK}
+    volumes:
+      - ./server/notebooks:/app
+      - .env:/app/.env
+    ports:
+      - "${JUPYTER_PORT}:8888"
+
+
+volumes:
+  pgdata:
+  pgadmin-data:
+
+networks: 
+  mynetwork: #needs to match .env
+    external: true

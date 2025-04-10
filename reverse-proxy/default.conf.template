@@ -1,0 +1,17 @@
+server {
+    listen 80;
+    server_name narenoramos.com;
+
+    location / {
+        root   /usr/share/nginx/html; 
+        index  index.html index.htm;
+
+        sub_filter 'API_KEY_RING' '${API_KEY}';
+        sub_filter_once off;
+    }
+
+    location /api/ {
+        proxy_pass http://backend:${SERVER_PORT}/;  
+        proxy_http_version 1.1;
+    }
+}
