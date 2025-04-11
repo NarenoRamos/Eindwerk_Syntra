@@ -15,25 +15,25 @@ De minuutwaarden worden verzameld door een **Python-script**, dat elke vijf minu
 ## Installatie
 Dit project draait in Docker, dus het is noodzakelijk om Docker geïnstalleerd te hebben op je apparaat om het project lokaal te kunnen uitvoeren. Volg onderstaande stappen om dit project lokaal op te zetten:
 
-#### 1. **Clone repository**
+1. **Clone repository**
 
  ```bash
  git clone https://github.com/NarenoRamos/Eindwerk_Syntra.git
  ```
  
-#### 2. **Conifigureer de .env file**
+2. **Conifigureer de .env file**
 Vul de poorten 
 #### 3. **Maak Docker netwerk aan**
 
  ```bash
  docker network create mynetwork
  ```
-#### 4. **Run docker compose**
+4. **Run docker compose**
 
  ```bash
  docker compose up -d
  ```
-#### 5. Database intitialisatie
+5. Database intitialisatie
 De link van de Jupyter server is terug te vinden door de logs te openen van de Jupyter container:
  ```bash
  docker logs jupyter-server
