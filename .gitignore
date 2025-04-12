@@ -1,10 +1,11 @@
 #env files
-#.env
+.env
 
 #logs
 
-#server/jobs/cron.log
+server/jobs/cron.log
 
 #other
 server/app/utils/__pycache__
 server/notebooks/docker/token.txt
+server/notebooks/.ipynb_checkpoints
