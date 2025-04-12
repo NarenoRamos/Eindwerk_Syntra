@@ -62,8 +62,11 @@ def get_df_speed(vehicle_class):
         AVG(md.snelheid_rek_{vehicle_class}) AS actual_speed
     FROM measurement_data AS md  
     LEFT JOIN measurement_points AS mp  
-    ON mp.measurement_id = md.unieke_id  
-    WHERE md.tijd_waarneming = (SELECT MAX(tijd_waarneming) FROM measurement_data) 
+        ON mp.measurement_id = md.unieke_id  
+    WHERE md.tijd_waarneming = (
+            SELECT MAX(tijd_waarneming)
+            FROM measurement_data
+        )
     AND md.snelheid_har_{vehicle_class} != 252
     GROUP BY matching_edge_id
     ;"""
@@ -81,11 +84,11 @@ def get_df_speed_ontime(vehicle_class, date, hour):
         FROM measurement_data AS md  
         LEFT JOIN measurement_points AS mp  
             ON mp.measurement_id = md.unieke_id  
-        WHERE md.tijd_waarneming >= '{date} {hour}:00:00'  
-        AND md.tijd_waarneming < '{date} {hour + 1}:00:00'
+        WHERE md.tijd_waarneming >= '{date} {hour}:00:00'::timestamp AT TIME ZONE 'UTC+1' AT TIME ZONE 'Europe/Brussels'
+        AND md.tijd_waarneming < '{date} {hour + 1}:00:00'::timestamp AT TIME ZONE 'UTC+1' AT TIME ZONE 'Europe/Brussels'
         AND md.snelheid_har_{vehicle_class} != 252
-        GROUP BY mp.matching_edge_id;
-        """
+        GROUP BY mp.matching_edge_id
+        ;"""
         )
 
     return df
@@ -104,11 +107,7 @@ def ring_with_speeds(vehicle_class, date, hour):
     df['max_speed'] = df['max_speed'].astype(float)
     df['actual_speed'] = df['actual_speed'].astype(float)
 
-    df['actual_speed'] = [
-        df['actual_speed'].iloc[x] if pd.notna(df['actual_speed'].iloc[x]) 
-        else (df['actual_speed'].iloc[x - 1] + df['actual_speed'].iloc[x + 1]) / 2 
-        for x in range(len(df))
-    ]
+    df['actual_speed'] = df['actual_speed'].interpolate(method='linear', limit_direction='both')
 
     df['speed_percentage'] = (df['actual_speed'] / df['max_speed'].replace(0, np.nan)) * 100
 
