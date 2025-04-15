@@ -100,6 +100,9 @@ def ring_with_speeds(vehicle_class, date, hour):
     else:
         df_speeds = get_df_speed_ontime(vehicle_class, date, hour)
 
+    if df_speeds.empty:
+        return df_speeds
+
     df = df_ring.merge(df_speeds, how='left', left_on='route', right_on='matching_edge_id')
     
     del df['matching_edge_id']

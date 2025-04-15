@@ -13,8 +13,6 @@ def get_routes():
     date = request.args.get("date")  # Haal de datum op uit de URL
     hour_str = request.args.get("hour")  # Haal het uur op uit de URL
 
-    print(f"Received date: {date}, hour: {hour_str}")
-
     if hour_str is None:
         return {"error": f"Missing 'hour' parameter, {date} {hour_str}"}, 400  # Bad Request error
     try:
