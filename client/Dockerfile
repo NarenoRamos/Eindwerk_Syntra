@@ -9,7 +9,7 @@ RUN npm run build
 RUN ls /app/dist
 
 # Stap 2: Serve de app met Nginx
-FROM nginx:alpine
+FROM nginx:1.27.4-alpine
 RUN apk add --no-cache gettext
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
