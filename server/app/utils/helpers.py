@@ -4,6 +4,9 @@ import psycopg2
 import numpy as np
 
 def df_from_query(SQL_query):
+    """
+    Will convert any sql query into a df
+    """
 
     host=os.getenv('DB_HOST')
     dbname=os.getenv('POSTGRES_DB')
@@ -28,6 +31,10 @@ def df_from_query(SQL_query):
     return df
 
 def get_df_ring():
+    """
+    Return df of edges ring in chronological order
+    """
+
     df_ring = df_from_query(
         """ 
         SELECT ring_id, route 
@@ -55,6 +62,10 @@ def get_df_ring():
     return end_df
 
 def get_df_speed(vehicle_class):
+    """
+    most up to date df of edge and speed 
+    """
+
     df = df_from_query(
     f"""
     SELECT  
@@ -75,6 +86,9 @@ def get_df_speed(vehicle_class):
     return df
 
 def get_df_speed_ontime(vehicle_class, date, hour):
+    """
+    df edge and average speed of given date and hour  
+    """
 
     df = df_from_query(
         f"""
@@ -94,23 +108,31 @@ def get_df_speed_ontime(vehicle_class, date, hour):
     return df
 
 def ring_with_speeds(vehicle_class, date, hour):
-    df_ring = get_df_ring()
+    """
+    Function which will return df of most up to date data or hourly average of date and hour, depending if the date is passed or an empty string is passed 
+    """
+
+    df_ring = get_df_ring() #Retrieves ring data [ring_id, route, max_speed, path]
+
+    if vehicle_class in [4, 5]: 
+        df_ring["max_speed"] = df_ring["max_speed"].apply(lambda x: 90 if x > 90 else x) #Makes max_speed 90 if vehicle class is 4 or 5 
+
     if date == "":
-        df_speeds = get_df_speed(vehicle_class)
+        df_speeds = get_df_speed(vehicle_class)  #Retrieves most up to date data [matching_edge_id, actual_speed]
     else:
-        df_speeds = get_df_speed_ontime(vehicle_class, date, hour)
+        df_speeds = get_df_speed_ontime(vehicle_class, date, hour) #Retrieves hourly average of timestamp [matching_edge_id, actual_speed]
 
     if df_speeds.empty:
-        return df_speeds
+        return df_speeds #Return empty df 
 
-    df = df_ring.merge(df_speeds, how='left', left_on='route', right_on='matching_edge_id')
+    df = df_ring.merge(df_speeds, how='left', left_on='route', right_on='matching_edge_id') #Merge tables in 1 table
     
-    del df['matching_edge_id']
+    del df['matching_edge_id'] #deletion duplicate column
 
     df['max_speed'] = df['max_speed'].astype(float)
     df['actual_speed'] = df['actual_speed'].astype(float)
 
-    df['actual_speed'] = df['actual_speed'].interpolate(method='linear', limit_direction='both')
+    df['actual_speed'] = df['actual_speed'].interpolate(method='linear', limit_direction='both') #Fill table
 
     df['speed_percentage'] = (df['actual_speed'] / df['max_speed'].replace(0, np.nan)) * 100
 
