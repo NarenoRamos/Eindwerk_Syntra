@@ -12,7 +12,8 @@ const App = (args) => {
   const [routes, setRoutes] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hour, setHour] = useState(12); 
-  const [date, setDate] = useState("");  // ← Voeg deze regel toe
+  const [date, setDate] = useState(""); 
+  const [vehicleClass, setvehicleClass] = useState(2);
   
   const intervalRef = useRef(null);
   const toggle = () => setIsOpen(!isOpen);
@@ -20,7 +21,7 @@ const App = (args) => {
 
   useEffect(() => {
     const getRoutes = async () => {
-      const newRoutes = await fetchRoutes(date, hour);
+      const newRoutes = await fetchRoutes(vehicleClass, date, hour);
       setRoutes(newRoutes);
     };
   
@@ -32,11 +33,11 @@ const App = (args) => {
     intervalRef.current = setInterval(getRoutes, 60000);
   
     return () => clearInterval(intervalRef.current); // Cleanup interval bij unmount
-  }, [date, hour]);
+  }, [vehicleClass, date, hour]);
   
   return (
     <div>
-      <MapContainer center={position} zoom={14} scrollWheelZoom={true}>
+      <MapContainer center={position} zoom={13} scrollWheelZoom={true}>
         
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
@@ -70,6 +71,25 @@ const App = (args) => {
                   Analisis Tool 
                 </CardTitle>
                 <Form>
+                <FormGroup>
+                  <Label for="exampleSelect">
+                    Vehicle Class
+                  </Label>
+                  <Input id="exampleSelect" name="select" type="select" value={vehicleClass} onChange={(e) => setvehicleClass(e.target.value)}>
+                  <option value={2}>
+                    2 - Passenger cars
+                  </option>
+                  <option value={3}>
+                    3 - Delivery vans
+                  </option>
+                  <option value={4}>
+                    4 - Rigid trucks
+                  </option>
+                  <option value={5}>
+                    5 - Articulated trucks or buses
+                  </option>
+                  </Input>
+                </FormGroup>
                   <FormGroup>
                     <Label for="exampleDate">Choose date</Label>
                     <Input id="exampleDate" name="date" placeholder="date placeholder" type="date" value={date} onChange={(e) => setDate(e.target.value)}/>
