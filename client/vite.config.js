@@ -8,7 +8,7 @@ export default defineConfig({
     allowedHosts: ["*"], //change this to own dev domain
     proxy: {
       '/api': {
-        target: 'http://backend:5000',
+        target: 'http://backend:5000', //change this to own setup
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
