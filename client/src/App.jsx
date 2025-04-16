@@ -61,7 +61,7 @@ const App = (args) => {
       </MapContainer>
 
       <div className="input-form-container">
-          <Button className="colapse-button" color="primary" onClick={toggle} style={{ marginBottom: '1rem' }}>
+          <Button className="colapse-button" color="primary" onClick={toggle}>
             Analyse
           </Button>
           <Collapse isOpen={isOpen} {...args}>

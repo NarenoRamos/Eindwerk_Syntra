@@ -22,6 +22,24 @@ html, body, #root {
   width: 25%;
 }
 
+@media (max-width: 768px) {
+  .input-form-container {
+    top: auto;
+    position: fixed;
+    bottom: 4.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;    
+  }
+
+  .colapse-button{
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%; 
+  }
+}
+
 .colapse-button{
   position: absolute;
   top: 0rem;
