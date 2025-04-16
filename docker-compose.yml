@@ -17,7 +17,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:9.2
     container_name: ${PGAMDIN_HOST}
     restart: always
     env_file: .env
