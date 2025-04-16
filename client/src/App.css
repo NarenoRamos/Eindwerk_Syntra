@@ -26,13 +26,14 @@ html, body, #root {
   .input-form-container {
     top: auto;
     position: fixed;
-    bottom: 4.5rem;
+    bottom: 3rem;
     left: 50%;
     transform: translateX(-50%);
     width: 90%;    
   }
 
   .colapse-button{
+    top: auto;
     position: relative;
     left: 50%;
     transform: translateX(-50%);
