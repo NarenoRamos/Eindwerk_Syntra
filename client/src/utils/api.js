@@ -1,8 +1,5 @@
-//const API_URL_RING = import.meta.env.VITE_API_URL
-
 export const fetchRoutes = async (vehicleClass, date, hour) => {
   try {
-    //const response = await fetch(`${API_URL_RING}?date=${date}&hour=${hour}`);
     const response = await fetch(`/api/v1/routes?date=${date}&hour=${hour}&vhclass=${vehicleClass}`);
 
     if (!response.ok) {

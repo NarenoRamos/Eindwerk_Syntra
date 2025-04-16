@@ -84,8 +84,7 @@ services:
       - "${REACT_DEV_PORT}:5173"
     volumes:
       - ./client:/app
-    environment:
-      VITE_API_URL: http://backend:${FLASK_PORT}/${API_KEY}/
+      - /app/node_modules
     networks:
       - ${NETWORK}
     depends_on:

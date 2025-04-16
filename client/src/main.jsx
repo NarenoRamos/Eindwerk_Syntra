@@ -6,7 +6,6 @@ import App from "./App";
 import "leaflet/dist/leaflet.css"; 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-//console.log(import.meta.env)
 
 root.render(
   <React.StrictMode>
