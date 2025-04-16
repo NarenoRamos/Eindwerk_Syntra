@@ -5,7 +5,7 @@ import { Collapse, Button, CardBody, Card, CardTitle, Form, FormGroup, Label, In
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./App.css";
 
-import { fetchRoutes } from "./api";
+import { fetchRoutes } from "./utils/api";
 
 const App = (args) => {
   const position = [51.2223, 4.3960];
